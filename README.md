@@ -1,29 +1,15 @@
-# Media Tools
+# 🎥 Media Tools
 
-A collection of tools for media compression, including:
+A collection of tools for compressing and processing media files, including JPEG image compression in C++ and video compression in Python using FFmpeg or OpenCV.
 
-- **Image Compression** using C++ and libjpeg
-- **Video Compression** using Python and FFmpeg (or OpenCV)
+---
 
 ## 📁 Project Structure
 
-- `image_compression/`: Contains C++ code for JPEG image compression.
-- `video_compression/`: Contains Python code for compressing videos.
-
-## 🛠️ Requirements
-
-For image compression:
-- `libjpeg` development libraries (e.g., `libjpeg-dev` or `libjpeg-turbo-devel`)
-
-For video compression:
-- `Python 3.x`
-- `ffmpeg` (must be installed and added to PATH)
-- Python packages: `opencv-python`, `ffmpeg-python` *(optional)*
-
-## 📸 Image Compression
-
-Compile with:
-
-```bash
-g++ image_compression.cpp -o image_compression -ljpeg
-./image_compression input.jpg output.jpg 75
+```plaintext
+media-tools/
+├── image_compression/
+│   └── image_compression.cpp      # JPEG compression using libjpeg
+├── video_compression/
+│   └── video_compression.py       # Video compression using FFmpeg/OpenCV
+└── README.md                      # This documentation
