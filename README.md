@@ -1,6 +1,3 @@
----
-
-````markdown
 # 🎥 Media Tools
 
 A collection of terminal-based tools for compressing and processing media files — including **image compression** in C++, **video compression** in Python, and **YouTube video/audio downloading** via the terminal.
@@ -23,7 +20,7 @@ media-tools/
 │   └── README.md                      # Instructions for downloader tools
 │
 └── README.md                         # This documentation
-````
+```
 
 ---
 
@@ -65,6 +62,7 @@ media-tools/
     ```bash
     sudo apt-get install libjpeg-dev
     ```
+
   * **On Fedora/RHEL**:
 
     ```bash
@@ -124,18 +122,3 @@ python video_compression.py input.mp4 output.mp4
 ## ✨ Author
 
 Created with ❤️ by **balanGH**
-
-```
-
----
-
-### Key Updates:
-1. **Organization**: The project structure is made clearer, detailing where each tool resides (image compression, video compression, downloader tools).
-2. **Requirements**: A specific section for general, Python, and system dependencies.
-3. **Usage**: Concise steps for running each tool, both for the downloader and the compression tools.
-4. **Author**: Added a personalized "Author" section.
-
-This version should now clearly reflect the overall structure and provide concise instructions for using each tool in the project.
-
-Let me know if you'd like to modify or add anything!
-```

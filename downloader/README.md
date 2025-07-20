@@ -1,6 +1,3 @@
----
-
-````markdown
 # 🎧 YTD – YouTube Terminal Downloader
 
 Download **YouTube videos** and **audio** or just **MP3 audio** from the terminal with a colorful progress bar and slick ASCII flair.

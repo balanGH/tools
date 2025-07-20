@@ -1,6 +1,3 @@
----
-
-````markdown
 # 🎥 Media Compression Tools
 
 A collection of tools for compressing **images** and **videos** using different technologies:
