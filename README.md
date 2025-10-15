@@ -197,7 +197,3 @@ For educational and personal use. Modify and distribute responsibly.
 ## 👨‍💻 Author
 
 Created with ❤️ by **balanGH**
-
----
-
-Would you like me to help you create **individual README.md** files for each folder too?
