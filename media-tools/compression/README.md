@@ -142,8 +142,6 @@ This tool uses **Python** and **FFmpeg** or **OpenCV** to compress video files.
 
 Created with ❤️ by **balanGH**
 
-```
-
 ---
 
 ### Key Details:
@@ -155,8 +153,4 @@ Created with ❤️ by **balanGH**
   
 3. **Video Compression**:
    - Explains how to **use** the video compression script and includes example terminal output for user guidance.
-
-This **`README.md`** now provides only the essential details for **compressing images and videos**.
-
-Let me know if you need any more modifications!
-```
+   

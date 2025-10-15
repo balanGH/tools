@@ -86,8 +86,6 @@ Choose audio format number: 2
 
 Created with ❤️ by **balanGH**
 
-```
-
 ---
 
 ### Key Features:
@@ -95,8 +93,3 @@ Created with ❤️ by **balanGH**
 2. **Getting Started**: Details on how to clone the repository, install dependencies, and run the script.
 3. **Interactive Prompts**: Provides a guide to follow the prompts for downloading video and audio.
 4. **File Output**: Specifies how the downloaded content will be saved.
-
-This updated **`README.md`** is now complete for your **YouTube Terminal Downloader (YTD)** tool!
-
-Let me know if you'd like to add more information or tweak anything else.
-```
