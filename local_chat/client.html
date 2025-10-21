@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Private Chat</title>
+    <style>
+        body {
+            background: #121212;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #container {
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            height: 90%;
+            border: 1px solid #333;
+            border-radius: 10px;
+            background: #1f1f1f;
+            overflow: hidden;
+        }
+
+        #header {
+            background: #333;
+            padding: 10px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #logoutBtn {
+            background: #e53935;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            display: none;
+        }
+
+        #chat {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bubble {
+            max-width: 75%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 15px;
+            word-wrap: break-word;
+            position: relative;
+        }
+
+        .me {
+            background: #4caf50;
+            align-self: flex-end;
+            border-bottom-right-radius: 0;
+        }
+
+        .friend {
+            background: #2d7dd2;
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+        }
+
+        .tick {
+            font-size: 12px;
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            color: #ccc;
+        }
+
+        .tick.seen {
+            color: #4fc3f7;
+        }
+
+        img {
+            max-width: 100px;
+            display: block;
+            margin-top: 5px;
+        }
+
+        #footer {
+            display: flex;
+            padding: 5px;
+            background: #2b2b2b;
+        }
+
+        #footer input[type="text"] {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            background: #444;
+            color: #fff;
+        }
+
+        #footer button {
+            background: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 8px 10px;
+            margin-left: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #friend {
+            margin: 10px;
+            width: calc(100% - 20px);
+            padding: 5px;
+            border-radius: 5px;
+            border: none;
+            background: #333;
+            color: #fff;
+        }
+
+        #loginArea {
+            display: flex;
+            gap: 5px;
+            padding: 10px;
+        }
+
+        #username {
+            flex: 1;
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+            background: #333;
+            color: #fff;
+        }
+
+        #loginBtn {
+            background: #4caf50;
+            border: none;
+            color: #fff;
+            padding: 8px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="header">
+            <span id="headerText">🔐 Local Chat</span>
+            <button id="logoutBtn" onclick="logout()">Logout</button>
+        </div>
+
+        <div id="loginArea">
+            <input id="username" placeholder="Enter your username">
+            <button id="loginBtn" onclick="login()">Login</button>
+        </div>
+
+        <input id="friend" placeholder="Friend username" style="display:none;">
+
+        <div id="chat"></div>
+
+        <div id="footer" style="display:none;">
+            <input id="msg" placeholder="Type message...">
+            <button onclick="sendMsg()">Send</button>
+            <button onclick="sendEmoji()">😀</button>
+            <!-- <input type="file" id="fileInput" accept="image/*" onchange="sendImage(event)"> -->
+        </div>
+    </div>
+
+    <script>
+        let ws;
+        let myName;
+        const ticks = {}; // Store ticks by message ID
+
+        function login() {
+            myName = document.getElementById('username').value.trim();
+            if (!myName) return alert("Enter a username");
+
+            ws = new WebSocket('ws://localhost:8080'); // ⚠️ Replace with Termux IP
+
+            ws.onopen = () => {
+                ws.send(myName);
+                document.getElementById('headerText').innerText = `👤 ${myName}`;
+                document.getElementById('logoutBtn').style.display = 'inline-block';
+                document.getElementById('loginArea').style.display = 'none';
+                document.getElementById('friend').style.display = 'block';
+                document.getElementById('footer').style.display = 'flex';
+            };
+
+            ws.onmessage = (e) => {
+                const obj = JSON.parse(e.data);
+                if (obj.type === "message") {
+                    addMessage(obj.from, obj.msg, false, obj.id);
+                    // Send seen back
+                    ws.send(JSON.stringify({ type: "seen", to: obj.from, id: obj.id }));
+                } else if (obj.type === "seen") {
+                    const tickEl = document.getElementById(`tick-${obj.id}`);
+                    if (tickEl) tickEl.classList.add('seen');
+                }
+            };
+
+            loadChat();
+        }
+
+        function logout() {
+            if (ws) ws.close();
+            localStorage.removeItem('chat');
+            document.getElementById('chat').innerHTML = '';
+            document.getElementById('username').value = '';
+            document.getElementById('friend').value = '';
+
+            document.getElementById('headerText').innerText = '🔐 Local Chat';
+            document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('loginArea').style.display = 'flex';
+            document.getElementById('friend').style.display = 'none';
+            document.getElementById('footer').style.display = 'none';
+        }
+
+        function addMessage(sender, msg, isMine, id = Date.now()) {
+            const div = document.createElement('div');
+            div.className = `bubble ${isMine ? 'me' : 'friend'}`;
+
+            if (msg.startsWith("data:image")) {
+                const img = document.createElement("img");
+                img.src = msg;
+                div.innerHTML = `<b>${sender}:</b>`;
+                div.appendChild(img);
+            } else {
+                div.innerHTML = `<b>${sender}:</b> ${msg}`;
+            }
+
+            if (isMine) {
+                const tick = document.createElement('span');
+                tick.className = 'tick';
+                tick.id = `tick-${id}`;
+                tick.innerText = '✅✅';
+                div.appendChild(tick);
+            }
+
+            document.getElementById('chat').appendChild(div);
+            document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+            saveChat();
+        }
+
+        function sendMsg() {
+            const msg = document.getElementById('msg').value.trim();
+            const friend = document.getElementById('friend').value.trim();
+            if (friend && msg) {
+                const id = Date.now();
+                ws.send(JSON.stringify({
+                    type: "message",
+                    to: friend,
+                    msg: msg,
+                    id: id
+                }));
+                addMessage(myName, msg, true, id);
+                document.getElementById('msg').value = '';
+            }
+        }
+
+        function sendEmoji() {
+            const friend = document.getElementById('friend').value.trim();
+            if (friend) {
+                const id = Date.now();
+                ws.send(JSON.stringify({
+                    type: "message",
+                    to: friend,
+                    msg: "😀",
+                    id: id
+                }));
+                addMessage(myName, "😀", true, id);
+            }
+        }
+
+        function sendImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                const friend = document.getElementById('friend').value.trim();
+                const id = Date.now();
+                ws.send(JSON.stringify({
+                    type: "message",
+                    to: friend,
+                    msg: reader.result,
+                    id: id
+                }));
+                addMessage(myName, reader.result, true, id);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveChat() {
+            localStorage.setItem('chat', document.getElementById('chat').innerHTML);
+        }
+
+        function loadChat() {
+            const saved = localStorage.getItem('chat');
+            if (saved) document.getElementById('chat').innerHTML = saved;
+        }
+    </script>
+</body>
+
+</html>
